@@ -1,4 +1,3 @@
-import pickle
 from random import randint
 
 
@@ -10,8 +9,9 @@ class Player:
         self.rate = 0
         self.gm = 0
 
-        # переменные для игр
+        # переменные для "монеточки"
         self.coin = 0
+        self.buyHelp = None
 
     def coinflip(self):
         coin = 0
@@ -28,10 +28,37 @@ class Player:
                 self.coin = randint(1, 2)
                 if self.coin == self.bet:
                     self.money += self.rate * 2
+                    # +1 к винстрику
+                    if self.winstreak <= 0:
+                        self.winstreak = 1
+                    elif self.winstreak >= 1:
+                        self.winstreak += 1
+                    
                     print(f"Вы победили! Ваш приз - {self.rate * 2}.\nВаш баланс - {self.money}.\n")
+                    print(f"Ваш винстрик - {self.winstreak}")
                 else:
-                    self.money -= self.rate
                     print("К сожалению, вы проиграли.")
+                    if self.winstreak >= 10:
+                        print(f"Но так как у вас есть {self.winstreak}, вы можете потратить 10 ед., что-бы вернуть свои деньги.")
+                        i = input("Согласны? (y/n)")
+                        if i == 'y':
+                            self.buyHelp = True
+                            self.winstreak -= 10
+                            print("Вы не потратили свои деньги.")
+                            print(f"Ваш винстрик - {self.winstreak}")
+                    else:
+                        self.buyHelp = False
+                            
+                    if self.buyHelp == False:
+                        self.money -= self.rate
+                        print(f"Ваш баланс - {self.money} (-{self.rate})")
+                    # обнуление/-1 к винстрику
+                        if self.winstreak < 0:
+                            self.winstreak -= 1
+                        
+                        elif self.winstreak > 0:
+                            self.winstreak = 0
+                        print(f"Ваш винстрик - {self.winstreak}")
                     if self.money > 0:
                         print("Сыграем еще раз? (y/n)")
                         i = input(">>> ")
