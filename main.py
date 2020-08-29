@@ -1,12 +1,18 @@
+import pickle
 from random import randint
 
+statesfile = "playerinfo.data"
 
 class Player:
     def __init__(self):
+        # "общие" переменные
         self.money = 25
         self.winstreak = 0
         self.bet = 0
         self.rate = 0
+        
+        # для сохранения/загрузки прогресса
+        self.state = {}
         
         # супер-юзер
         self.gm = 0
@@ -107,6 +113,21 @@ class Player:
             for j in self.CFgames:
                 count += 1
                 print(f"{count}. {j}")
+    
+    def savestate(self):
+        self.states = {"money": self.money, "winstreak": self.winstreak}
+        f = open(statesfile, 'wb')
+        pickle.dump(self.states, f)
+        f.close()
+        print("Прогресс сохранен!\n")
+    
+    def loadstate(self):
+        f = open(statesfile, 'rb')
+        loadeddata = pickle.load(f)
+        f.close()
+        self.money = loadeddata["money"]
+        self.winstreak = loadeddata["winstreak"]
+        print("Прогресс загружен!\n")
 
 
 user = Player()
@@ -115,7 +136,9 @@ while True:
     print("1. Коинфлип")
     print("2. Права супер-юзера %s" % user.status)
     print("3. История игр %s" % user.CFlist_status)
-    print("4. Баланс игрока")
+    print("4. Сохранить прогресс")
+    print("5. Загрузить прогресс")
+    print("6. Баланс игрока")
     
     act = int(input(">>> "))
     
@@ -126,6 +149,10 @@ while True:
     elif act == 3:
         user.CFreplays()
     elif act == 4:
+        user.savestate()
+    elif act == 5:
+        user.loadstate()
+    elif act == 6:
         print(f"Баланс - {user.money}")
     else:
         break
