@@ -117,15 +117,16 @@ class Player:
 
     def savestate(self):
         self.states = {"money": self.money, "winstreak": self.winstreak}
-        f = open(statesfile, 'wb')
-        pickle.dump(self.states, f)
-        f.close()
+
+        with open(statesfile, "wb") as file:
+            pickle.dump(self.states, file)
+
         print("Прогресс сохранен!\n")
 
     def loadstate(self):
-        f = open(statesfile, 'rb')
-        loadeddata = pickle.load(f)
-        f.close()
+        with open(statesfile, 'rb') as file:
+            loadeddata = pickle.load(file)
+
         self.money = loadeddata["money"]
         self.winstreak = loadeddata["winstreak"]
         print("Прогресс загружен!\n")
