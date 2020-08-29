@@ -11,22 +11,24 @@ class Player:
         self.winstreak = 0
         self.bet = 0
         self.rate = 0
+        
+        # банк
+        self.bankcoins = 1
 
-        # для сохранения/загрузки прогресса
+        # для сохранения/загрузки прогресса (120-135)
         self.state = {}
 
-        # супер-юзер
+        # супер-юзер (102-107)
         self.gm = 0
         self.status = ""
 
-        # переменные для "монеточки"
+        # переменные для "монеточки" (31-100)
         self.coin = 0
         self.buyHelp = None
         self.CFgames = []
         self.CFlist_status = ""
 
     def coinflip(self):
-        # coin = 0
         print("Коинфлип (или же монеточка) - все зависит от вашей удачи.")
         print("Поставьте ставку, и если вы победите, вы получите в 2 раза больше")
         print("Если проиграете, вы потеряете ту сумму, которую вложили.")
@@ -107,7 +109,7 @@ class Player:
     # история coinflip игр
     def CFreplays(self):
         if self.CFgames == []:
-            print("Неактивирован. Сыграйте 1 игру в CF.")
+            print("\nНеактивирован. Сыграйте 1 игру в CF.\n")
         else:
             self.CFlist_status = "[Активно!]"
             count = 0
@@ -116,12 +118,12 @@ class Player:
                 print(f"{count}. {j}")
 
     def savestate(self):
-        self.states = {"money": self.money, "winstreak": self.winstreak}
+        self.states = {"money": self.money, "winstreak": self.winstreak, "coins": self.bankcoins}
 
         with open(statesfile, "wb") as file:
             pickle.dump(self.states, file)
 
-        print("Прогресс сохранен!\n")
+        print("\nПрогресс сохранен!\n")
 
     def loadstate(self):
         with open(statesfile, 'rb') as file:
@@ -129,8 +131,61 @@ class Player:
 
         self.money = loadeddata["money"]
         self.winstreak = loadeddata["winstreak"]
-        print("Прогресс загружен!\n")
-
+        self.bankcoins = loadeddata["coins"]
+        print("\nПрогресс загружен!\n")
+        
+    def bank(self):
+        print("Выберите функцию:")
+        print("1. Обменять деньги на монеты {25 денег -> 1 монета}")
+        print("2. Обменять винстрик на монеты {5 винстрика -> 1 монета}")
+        print("3. Обменять монеты на деньги {1 монета -> 20 денег}")
+        print("4. Обменять монеты на винстрик {1 монета -> 5 винстрика}")
+        print("5. Что за банк?")
+        print("6. Выйти")
+        print(f"Запас ваших монеток в банке - {self.bankcoins}")
+        act = int(input(">>> "))
+        
+        if act == 1:
+            if self.money >= 25:
+                self.money -= 25
+                self.bankcoins += 1
+                print(f"Вы купили 1 монету. {self.bankcoins}")
+                print(f"Ваш баланс - {self.money}")
+            else:
+                print(f"У вас мало денег для покупки монет.\nНакопите еще {25 - self.money}")
+        
+        elif act == 2:
+            if self.winstreak >= 5:
+                self.winstreak -= 5
+                self.bankcoins += 1
+                print(f"Вы купили 1 монету. {{self.backcoins}}")
+                print(f"Ваш винстрик - {self.winstreak}")
+            else:
+                print(f"У вас мало винстрика для покупки монет! Накопите еще {5 - self.winstreak}")
+                
+        elif act == 3:
+            if self.bankcoins >= 1:
+                self.bankcoins -= 1
+                self.money += 20
+                print(f"Вы обменяли 1 монету на 20 денег. ({self.bankcoins} монет осталось)")
+                print(f"Ваш баланс - {self.money}")
+            else:
+                print("Недостаточно монет.")
+                    
+        elif act == 4:
+            if self.bankcoins >= 1:
+                self.bankcoins -= 1
+                self.winstreak += 5
+                print(f"Вы обменяли 1 монету на 5 винстриков. ({self.bankcoins} монет осталось)")
+                print(f"Ваш винстрик - {self.winstreak}")
+            else:
+                print("Недостаточно монет")
+            
+        elif act == 5:
+            print("\nЭто банк, в котором вы можете обменивать свои ресурсы на монеты. Монеты - накопительная валюта, и она будет лежать в банке бесконечно.\n")
+            
+        else:
+            pass
 
 user = Player()
 while True:
@@ -140,7 +195,8 @@ while True:
     print("3. История игр %s" % user.CFlist_status)
     print("4. Сохранить прогресс")
     print("5. Загрузить прогресс")
-    print("6. Баланс игрока")
+    print("6. Банк")
+    print("7. Баланс игрока")
 
     act = int(input(">>> "))
 
@@ -155,6 +211,10 @@ while True:
     elif act == 5:
         user.loadstate()
     elif act == 6:
-        print(f"Баланс - {user.money}")
+        user.bank()
+    elif act == 7:
+        print(f"\nБаланс - {user.money}")
+        print(f"Винстрик - {user.winstreak}")
+        print(f"Монеты в банке - {user.bankcoins}\n")
     else:
         break
