@@ -3,6 +3,7 @@ from random import randint
 
 statesfile = "playerinfo.data"
 
+
 class Player:
     def __init__(self):
         # "общие" переменные
@@ -10,10 +11,10 @@ class Player:
         self.winstreak = 0
         self.bet = 0
         self.rate = 0
-        
+
         # для сохранения/загрузки прогресса
         self.state = {}
-        
+
         # супер-юзер
         self.gm = 0
         self.status = ""
@@ -25,7 +26,7 @@ class Player:
         self.CFlist_status = ""
 
     def coinflip(self):
-        coin = 0
+        # coin = 0
         print("Коинфлип (или же монеточка) - все зависит от вашей удачи.")
         print("Поставьте ставку, и если вы победите, вы получите в 2 раза больше")
         print("Если проиграете, вы потеряете ту сумму, которую вложили.")
@@ -39,7 +40,7 @@ class Player:
                 print("У вас мало денег для такой ставки!")
             else:
                 if self.rate == self.money:
-                    print("Видимо, вы очень смелый человек, раз решили потратить сразу все деньги..")
+                    print("Видимо, вы очень смелый человек, раз решили потратить сразу все деньги...")
                 self.bet = int(input("\nОрел или решка? (1/2)\n>>> "))
                 self.coin = randint(1, 2)
                 if self.coin == self.bet:
@@ -49,7 +50,7 @@ class Player:
                         self.winstreak = 0
                     elif self.winstreak >= 0:
                         self.winstreak += 1
-                    
+
                     print(f"Вы победили! Ваш приз - {self.rate * 2}.\nВаш баланс - {self.money}.\n")
                     print(f"Ваш винстрик - {self.winstreak}")
                     self.CFgames.append("(+%(win)s) {Баланс %(money)s}" % {"win": self.rate, "money": self.money})
@@ -68,14 +69,14 @@ class Player:
                             self.buyHelp = False
                     else:
                         self.buyHelp = False
-                            
-                    if self.buyHelp == False:
+
+                    if not self.buyHelp:
                         self.money -= self.rate
                         print(f"Ваш баланс - {self.money} (-{self.rate})")
-                    # обнуление/-1 к винстрику
+                        # обнуление/-1 к винстрику
                         if self.winstreak <= 0:
                             self.winstreak -= 1
-                        
+
                         elif self.winstreak > 0:
                             self.winstreak = 0
                         print(f"Ваш винстрик - {self.winstreak}")
@@ -92,17 +93,17 @@ class Player:
                         print("У вас 0 денег.")
                         break
 
-            coin = 0
+            # coin = 0
             self.bet = 0
             self.rate = 0
-    
+
     def op(self):
         self.gm = 1
         self.money = 1000000
         self.winstreak = 5000
         self.status = "[АКТИВИРОВАНО]"
         print("Super-User активирован!")
-    
+
     # история coinflip игр
     def CFreplays(self):
         if self.CFgames == []:
@@ -113,18 +114,19 @@ class Player:
             for j in self.CFgames:
                 count += 1
                 print(f"{count}. {j}")
-    
+
     def savestate(self):
         self.states = {"money": self.money, "winstreak": self.winstreak}
-        f = open(statesfile, 'wb')
-        pickle.dump(self.states, f)
-        f.close()
+
+        with open(statesfile, "wb") as file:
+            pickle.dump(self.states, file)
+
         print("Прогресс сохранен!\n")
-    
+
     def loadstate(self):
-        f = open(statesfile, 'rb')
-        loadeddata = pickle.load(f)
-        f.close()
+        with open(statesfile, 'rb') as file:
+            loadeddata = pickle.load(file)
+
         self.money = loadeddata["money"]
         self.winstreak = loadeddata["winstreak"]
         print("Прогресс загружен!\n")
@@ -139,9 +141,9 @@ while True:
     print("4. Сохранить прогресс")
     print("5. Загрузить прогресс")
     print("6. Баланс игрока")
-    
+
     act = int(input(">>> "))
-    
+
     if act == 1:
         user.coinflip()
     elif act == 2:
