@@ -12,8 +12,12 @@ if checkfile:
 
 class Player:
     def __init__(self):
+        
+        # стартовая сумма денег
+        self.startmoney = 35
+        
         # "общие" переменные
-        self.money = 25
+        self.money = self.startmoney
         self.winstreak = 0
         self.bet = 0
         self.rate = 0
@@ -154,18 +158,18 @@ class Player:
     def bank(self):
         while True:
             print("Выберите функцию:")
-            print("1. Обменять деньги на монеты {25 денег -> 1 монета}")
-            print("2. Обменять винстрик на монеты {5 винстрика -> 1 монета}")
-            print("3. Обменять монеты на деньги {1 монета -> 20 денег}")
-            print("4. Обменять монеты на винстрик {1 монета -> 5 винстрика}")
+            print("1. Обменять деньги на монеты {20 денег -> 1 монета}")
+            print("2. Обменять винстрик на монеты {3 винстрика -> 1 монета}")
+            print("3. Обменять монеты на деньги {1 монета -> 15 денег}")
+            print("4. Обменять монеты на винстрик {1 монета -> 3 винстрика}")
             print("5. Что за банк?")
             print("6. Выйти")
             print(f"Запас ваших монеток в банке - {self.bankcoins}")
             act = int(input(">>> "))
         
             if act == 1:
-                if self.money >= 25:
-                    self.money -= 25
+                if self.money >= 20:
+                    self.money -= 20
                     self.bankcoins += 1
                     print(f"Вы купили 1 монету. {self.bankcoins}")
                     print(f"Ваш баланс - {self.money}")
@@ -173,8 +177,8 @@ class Player:
                     print(f"У вас мало денег для покупки монет.\nНакопите еще {25 - self.money}")
         
             elif act == 2:
-                if self.winstreak >= 5:
-                    self.winstreak -= 5
+                if self.winstreak >= 3:
+                    self.winstreak -= 3
                     self.bankcoins += 1
                     print(f"Вы купили 1 монету. {{self.backcoins}}")
                     print(f"Ваш винстрик - {self.winstreak}")
@@ -184,7 +188,7 @@ class Player:
             elif act == 3:
                 if self.bankcoins >= 1:
                     self.bankcoins -= 1
-                    self.money += 20
+                    self.money += 15
                     print(f"Вы обменяли 1 монету на 20 денег. ({self.bankcoins} монет осталось)")
                     print(f"Ваш баланс - {self.money}")
                 else:
@@ -193,7 +197,7 @@ class Player:
             elif act == 4:
                 if self.bankcoins >= 1:
                     self.bankcoins -= 1
-                    self.winstreak += 5
+                    self.winstreak += 3
                     print(f"Вы обменяли 1 монету на 5 винстриков. ({self.bankcoins} монет осталось)")
                     print(f"Ваш винстрик - {self.winstreak}")
                 else:
@@ -215,6 +219,19 @@ class Player:
                 self.autoloadstat = "ВЫКЛ"
             else:
                 break
+    
+    def resetprogress(self):
+        print("\nВы точно хотите сбросить прогресс? y/n || д/н")
+        act = input(">>> ")
+        if act == "y" or act == "д":
+            self.money = self.startmoney
+            self.winstreak = 0
+            self.bankcoins = 0
+            self.CFgames = []
+            self.CFlist_status = ""
+            print("Прогресс успешно сброшен.")
+        else:
+            pass
 
 user = Player()
 if checkfile and autoload == "ВКЛ":
@@ -230,6 +247,7 @@ while True:
     print("6. Банк")
     print("7. Настройки")
     print("8. Баланс игрока")
+    print("9. Сбросить прогресс")
 
     act = int(input(">>> "))
 
@@ -251,5 +269,7 @@ while True:
         print(f"\nБаланс - {user.money}")
         print(f"Винстрик - {user.winstreak}")
         print(f"Монеты в банке - {user.bankcoins}\n")
+    elif act == 9:
+        user.resetprogress()
     else:
         break
