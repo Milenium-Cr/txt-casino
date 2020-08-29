@@ -21,11 +21,14 @@ class Player:
     def coinflip(self):
         coin = 0
         print("Коинфлип (или же монеточка) - все зависит от вашей удачи.")
-        print("Поставьте ставку, и если вы победите, вы получите в 2 раза больше от суммы ставки.")
+        print("Поставьте ставку, и если вы победите, вы получите в 2 раза больше")
         print("Если проиграете, вы потеряете ту сумму, которую вложили.")
+        print("Введите 0 для возвращения в меню.")
         while True:
             print("\nВаша ставка? {%s}" % self.money)
             self.rate = int(input(">>> "))
+            if self.rate == 0:
+                break
             if self.rate > self.money:
                 print("У вас мало денег для такой ставки!")
             else:
@@ -34,11 +37,11 @@ class Player:
                 self.bet = int(input("\nОрел или решка? (1/2)\n>>> "))
                 self.coin = randint(1, 2)
                 if self.coin == self.bet:
-                    self.money += self.rate * 2
+                    self.money += self.rate
                     # +1 к винстрику
-                    if self.winstreak <= 0:
-                        self.winstreak = 1
-                    elif self.winstreak >= 1:
+                    if self.winstreak < 0:
+                        self.winstreak = 0
+                    elif self.winstreak >= 0:
                         self.winstreak += 1
                     
                     print(f"Вы победили! Ваш приз - {self.rate * 2}.\nВаш баланс - {self.money}.\n")
@@ -64,7 +67,7 @@ class Player:
                         self.money -= self.rate
                         print(f"Ваш баланс - {self.money} (-{self.rate})")
                     # обнуление/-1 к винстрику
-                        if self.winstreak < 0:
+                        if self.winstreak <= 0:
                             self.winstreak -= 1
                         
                         elif self.winstreak > 0:
