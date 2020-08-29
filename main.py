@@ -1,8 +1,14 @@
 import pickle
+import os.path
 from random import randint
 
 statesfile = "playerinfo.data"
 
+checkfile = os.path.exists(f'{statesfile}')
+if checkfile:
+    with open(statesfile, 'rb') as f:
+        loadeddata = pickle.load(f)
+        autoload = loadeddata["autoload"]
 
 class Player:
     def __init__(self):
@@ -12,9 +18,12 @@ class Player:
         self.bet = 0
         self.rate = 0
         
-        # банк
+        # банк (142-194)
         self.bankcoins = 1
-
+        
+        # настройки
+        self.autoloadstat = "ВЫКЛ"
+        
         # для сохранения/загрузки прогресса (120-135)
         self.state = {}
 
@@ -118,7 +127,13 @@ class Player:
                 print(f"{count}. {j}")
 
     def savestate(self):
-        self.states = {"money": self.money, "winstreak": self.winstreak, "coins": self.bankcoins}
+        self.states = {
+            "money": self.money,
+            "winstreak": self.winstreak,
+            "coins": self.bankcoins,
+            "status": self.status,
+            "autoload": self.autoloadstat
+        }
 
         with open(statesfile, "wb") as file:
             pickle.dump(self.states, file)
@@ -132,62 +147,79 @@ class Player:
         self.money = loadeddata["money"]
         self.winstreak = loadeddata["winstreak"]
         self.bankcoins = loadeddata["coins"]
+        self.status = loadeddata["status"]
+        self.autoloadstat = loadeddata["autoload"]
         print("\nПрогресс загружен!\n")
         
     def bank(self):
-        print("Выберите функцию:")
-        print("1. Обменять деньги на монеты {25 денег -> 1 монета}")
-        print("2. Обменять винстрик на монеты {5 винстрика -> 1 монета}")
-        print("3. Обменять монеты на деньги {1 монета -> 20 денег}")
-        print("4. Обменять монеты на винстрик {1 монета -> 5 винстрика}")
-        print("5. Что за банк?")
-        print("6. Выйти")
-        print(f"Запас ваших монеток в банке - {self.bankcoins}")
-        act = int(input(">>> "))
+        while True:
+            print("Выберите функцию:")
+            print("1. Обменять деньги на монеты {25 денег -> 1 монета}")
+            print("2. Обменять винстрик на монеты {5 винстрика -> 1 монета}")
+            print("3. Обменять монеты на деньги {1 монета -> 20 денег}")
+            print("4. Обменять монеты на винстрик {1 монета -> 5 винстрика}")
+            print("5. Что за банк?")
+            print("6. Выйти")
+            print(f"Запас ваших монеток в банке - {self.bankcoins}")
+            act = int(input(">>> "))
         
-        if act == 1:
-            if self.money >= 25:
-                self.money -= 25
-                self.bankcoins += 1
-                print(f"Вы купили 1 монету. {self.bankcoins}")
-                print(f"Ваш баланс - {self.money}")
-            else:
-                print(f"У вас мало денег для покупки монет.\nНакопите еще {25 - self.money}")
+            if act == 1:
+                if self.money >= 25:
+                    self.money -= 25
+                    self.bankcoins += 1
+                    print(f"Вы купили 1 монету. {self.bankcoins}")
+                    print(f"Ваш баланс - {self.money}")
+                else:
+                    print(f"У вас мало денег для покупки монет.\nНакопите еще {25 - self.money}")
         
-        elif act == 2:
-            if self.winstreak >= 5:
-                self.winstreak -= 5
-                self.bankcoins += 1
-                print(f"Вы купили 1 монету. {{self.backcoins}}")
-                print(f"Ваш винстрик - {self.winstreak}")
-            else:
-                print(f"У вас мало винстрика для покупки монет! Накопите еще {5 - self.winstreak}")
+            elif act == 2:
+                if self.winstreak >= 5:
+                    self.winstreak -= 5
+                    self.bankcoins += 1
+                    print(f"Вы купили 1 монету. {{self.backcoins}}")
+                    print(f"Ваш винстрик - {self.winstreak}")
+                else:
+                    print(f"У вас мало винстрика для покупки монет! Накопите еще {5 - self.winstreak}")
                 
-        elif act == 3:
-            if self.bankcoins >= 1:
-                self.bankcoins -= 1
-                self.money += 20
-                print(f"Вы обменяли 1 монету на 20 денег. ({self.bankcoins} монет осталось)")
-                print(f"Ваш баланс - {self.money}")
-            else:
-                print("Недостаточно монет.")
+            elif act == 3:
+                if self.bankcoins >= 1:
+                    self.bankcoins -= 1
+                    self.money += 20
+                    print(f"Вы обменяли 1 монету на 20 денег. ({self.bankcoins} монет осталось)")
+                    print(f"Ваш баланс - {self.money}")
+                else:
+                    print("Недостаточно монет.")
                     
-        elif act == 4:
-            if self.bankcoins >= 1:
-                self.bankcoins -= 1
-                self.winstreak += 5
-                print(f"Вы обменяли 1 монету на 5 винстриков. ({self.bankcoins} монет осталось)")
-                print(f"Ваш винстрик - {self.winstreak}")
+            elif act == 4:
+                if self.bankcoins >= 1:
+                    self.bankcoins -= 1
+                    self.winstreak += 5
+                    print(f"Вы обменяли 1 монету на 5 винстриков. ({self.bankcoins} монет осталось)")
+                    print(f"Ваш винстрик - {self.winstreak}")
+                else:
+                    print("\nНедостаточно монет\n")
+            
+            elif act == 5:
+                print("\nЭто банк, в котором вы можете обменивать свои ресурсы на монеты. Монеты - накопительная валюта, и она будет лежать в банке бесконечно.\n")
+            
             else:
-                print("Недостаточно монет")
-            
-        elif act == 5:
-            print("\nЭто банк, в котором вы можете обменивать свои ресурсы на монеты. Монеты - накопительная валюта, и она будет лежать в банке бесконечно.\n")
-            
-        else:
-            pass
+                break
+                
+    def setings(self):
+        while True:
+            print(f"1. Автозагрузка {self.autoloadstat}")
+            setsettings = int(input(">>> "))
+            if setsettings == 1 and self.autoloadstat == "ВЫКЛ":
+                self.autoloadstat = "ВКЛ"
+            elif setsettings == 1 and self.autoloadstat == "ВКЛ":
+                self.autoloadstat = "ВЫКЛ"
+            else:
+                break
 
 user = Player()
+if checkfile and autoload == "ВКЛ":
+    user.loadstate()
+    
 while True:
     print("Выберите функцию")
     print("1. Коинфлип")
@@ -196,7 +228,8 @@ while True:
     print("4. Сохранить прогресс")
     print("5. Загрузить прогресс")
     print("6. Банк")
-    print("7. Баланс игрока")
+    print("7. Настройки")
+    print("8. Баланс игрока")
 
     act = int(input(">>> "))
 
@@ -213,6 +246,8 @@ while True:
     elif act == 6:
         user.bank()
     elif act == 7:
+        user.setings()
+    elif act == 8:
         print(f"\nБаланс - {user.money}")
         print(f"Винстрик - {user.winstreak}")
         print(f"Монеты в банке - {user.bankcoins}\n")
