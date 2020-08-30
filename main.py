@@ -40,6 +40,11 @@ class Player:
         self.buyHelp = None
         self.CFgames = []
         self.CFlist_status = ""
+        
+        # переменные для "камень ножницы бумага"
+        self.kanobubot = 0
+        self.KNBgames = []
+        self.KNBlist_status = ""
 
     def coinflip(self):
         print("Коинфлип (или же монеточка) - все зависит от вашей удачи.")
@@ -91,9 +96,9 @@ class Player:
                         # обнуление/-1 к винстрику
                         if self.winstreak <= 0:
                             self.winstreak -= 1
-
                         elif self.winstreak > 0:
                             self.winstreak = 0
+                            
                         print(f"Ваш винстрик - {self.winstreak}")
                         self.CFgames.append("(-%(lose)s) {Баланс %(money)s}" % {"lose": self.rate, "money": self.money})
                     if self.money > 0:
@@ -122,11 +127,21 @@ class Player:
     # история coinflip игр
     def CFreplays(self):
         if self.CFgames == []:
-            print("\nНеактивирован. Сыграйте 1 игру в CF.\n")
+            print("\nНеактивировано. Сыграйте 1 игру в CF.\n")
         else:
             self.CFlist_status = "[Активно!]"
             count = 0
             for j in self.CFgames:
+                count += 1
+                print(f"{count}. {j}")
+                
+    def KNBreplays(self):
+        if self.KNBgames == []:
+            print("\nНеактивировано. Сыграйте 1 игру в KNB.\n")
+        else:
+            self.KNBlist_status = "[Активно!]"
+            count = 0
+            for j in self.KNBgames:
                 count += 1
                 print(f"{count}. {j}")
 
@@ -226,12 +241,101 @@ class Player:
         if act == "y" or act == "д":
             self.money = self.startmoney
             self.winstreak = 0
-            self.bankcoins = 0
+            self.bankcoins = 1
+            self.status = ""
             self.CFgames = []
             self.CFlist_status = ""
             print("Прогресс успешно сброшен.")
         else:
             pass
+    
+    def games(self):
+        while True:
+            print("1. Коинфлип")
+            print("2. Камень-ножницы-бумага")
+            act = int(input(">>> "))
+            if act == 1:
+                user.coinflip()
+            elif act == 2:
+                user.kanobu()
+            else:
+                break
+    
+    def kanobu(self):
+        print("КаНоБу (камень-ножницы-бумага).")
+        print("Приз увеличен до х3.")
+        print("При проигрыше, нельзя вернуть свои деньги.")
+        print("Введите 0 для выхода в меню.")
+        
+        while True:
+            print("Какая будет ставка? {%s}" % self.money)
+            self.rate = int(input(">>> "))
+            if self.rate > self.money:
+                print("У вас нет таких денег!")
+            elif self.rate == 0:
+                break
+            else:
+                while True:
+                    print("\n1. Камень")
+                    print("2. Ножницы")
+                    print("3. Бумага\n")
+                    self.bet = int(input(">>> "))
+                    if self.bet > 0 and self.bet < 4:
+                        break
+                    else:
+                        print("\n\nНеверный ввод\n\n")
+                
+                self.kanobubot = randint(1, 3)
+                if self.bet == self.kanobubot:
+                    print("Ничья!")
+                    print("Вы не потратили деньги и винстрик.")
+                    self.KNBgames.append(f"НИЧЬЯ (Баланс{self.money})")
+                elif self.bet == 1 and \
+                    self.kanobubot == 2 or \
+                    self.bet == 2 and \
+                    self.kanobubot == 3 or \
+                    self.bet == 3 and \
+                    self.kanobubot == 1:
+                    self.money += self.rate * 3
+                    # +1 к винстрику
+                    if self.winstreak < 0:
+                        self.winstreak = 0
+                    elif self.winstreak >= 0:
+                        self.winstreak += 1
+                    print("Победа!")
+                    print(f"Ваш баланс - {self.money} (+{self.rate * 3})")
+                    print(f"Ваш винстрик - {self.winstreak}")
+                    self.KNBgames.append(f"ПОБЕДА (Баланс: {self.money} (+{self.rate})")
+                    
+                elif self.bet == 1 and \
+                    self.kanobubot == 3 or \
+                    self.bet == 2 and \
+                    self.kanobubot == 1 or \
+                    self.bet == 3 and \
+                    self.kanobubot == 2:
+                        self.money -= self.rate
+                        # обнуление/-1 к винстрику
+                        if self.winstreak <= 0:
+                            self.winstreak -= 1
+                        elif self.winstreak > 0:
+                            self.winstreak = 0
+                        
+                        print("Вы проиграли!")
+                        print(f"Ваш баланс - {self.money} (-{self.rate})")
+                        print(f"Ваш винстрик - {self.winstreak}")
+                        self.KNBgames.append(f"ПОРАЖЕНИЕ (Баланс: {self.money} (-{self.rate})")
+        
+    def replays(self):
+        while True:
+            print(f"\n\n1. КоинФлип игры {self.CFlist_status}")
+            print(f"2. КаНоБу игры {self.KNBlist_status}")
+            act = int(input(">>> "))
+            if act == 1:
+                self.CFreplays()
+            elif act == 2:
+                self.KNBreplays()
+            else:
+                break
 
 user = Player()
 if checkfile and autoload == "ВКЛ":
@@ -239,9 +343,9 @@ if checkfile and autoload == "ВКЛ":
     
 while True:
     print("Выберите функцию")
-    print("1. Коинфлип")
+    print("1. Игры")
     print("2. Права супер-юзера %s" % user.status)
-    print("3. История игр %s" % user.CFlist_status)
+    print("3. История игр")
     print("4. Сохранить прогресс")
     print("5. Загрузить прогресс")
     print("6. Банк")
@@ -252,11 +356,11 @@ while True:
     act = int(input(">>> "))
 
     if act == 1:
-        user.coinflip()
+        user.games()
     elif act == 2:
         user.op()
     elif act == 3:
-        user.CFreplays()
+        user.replays()
     elif act == 4:
         user.savestate()
     elif act == 5:
