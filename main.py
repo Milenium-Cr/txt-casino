@@ -1,6 +1,13 @@
 import pickle
 import os.path
-from random import randint
+from random import randint, choice
+
+"""
+* Хранилище в файле
+* В настройки "автосохранение"
+* Статус банка и хранилища в файле
+"""
+lvlupcost = [25, 30, 35, 40]
 
 statesfile = "playerinfo.data"
 
@@ -23,7 +30,8 @@ class Player:
         self.rate = 0
         
         # банк (142-194)
-        self.bankcoins = 1
+        self.bankcoins = 0
+        self.bankstatus = "НЕ ПОСТРОЕН"
         
         # настройки
         self.autoloadstat = "ВЫКЛ"
@@ -45,6 +53,14 @@ class Player:
         self.kanobubot = 0
         self.KNBgames = []
         self.KNBlist_status = ""
+        
+        # хранилище
+        self.storagedmoney = 0
+        self.putmoney = 0
+        self.storagelimit = 25
+        self.storagestatus = "НЕ ПОСТРОЕН"
+        self.storagelvl = 1
+        self.storagelvlup = 40
 
     def coinflip(self):
         print("Коинфлип (или же монеточка) - все зависит от вашей удачи.")
@@ -151,7 +167,12 @@ class Player:
             "winstreak": self.winstreak,
             "coins": self.bankcoins,
             "status": self.status,
-            "autoload": self.autoloadstat
+            "autoload": self.autoloadstat,
+            "bankstatus": self.bankstatus,
+            "storagestatus": self.storagestatus,
+            "storagelevel": self.storagelvl,
+            "storagelimit": self.storagelimit,
+            "storagedmoney": self.storagedmoney
         }
 
         with open(statesfile, "wb") as file:
@@ -168,6 +189,11 @@ class Player:
         self.bankcoins = loadeddata["coins"]
         self.status = loadeddata["status"]
         self.autoloadstat = loadeddata["autoload"]
+        self.bankstatus = loadeddata["bankstatus"]
+        self.storagestatus = loadeddata["storagestatus"]
+        self.storagelvl = loadeddata["storagelevel"]
+        self.storagelimit = loadeddata["storagelimit"]
+        self.storagedmoney = loadeddata["storagedmoney"]
         print("\nПрогресс загружен!\n")
         
     def bank(self):
@@ -245,6 +271,13 @@ class Player:
             self.status = ""
             self.CFgames = []
             self.CFlist_status = ""
+            self.KNBgames = []
+            self.KNBlist_status = ""
+            self.storagelimit = 25
+            self.storagelvl = 1
+            self.storagedmoney = 0
+            self.bankstatus = "НЕ ПОСТРОЕН"
+            self.storagestatus = "НЕ ПОСТРОЕН"
             print("Прогресс успешно сброшен.")
         else:
             pass
@@ -336,6 +369,125 @@ class Player:
                 self.KNBreplays()
             else:
                 break
+                
+    def storage(self):
+        while True:
+            print("1. Положить деньги")
+            print("2. Забрать деньги")
+            print("3. Прокачать хранилище")
+            print("4. Что за хранилище?")
+            print(f"Ваш баланс - {self.storagedmoney}/{self.storagelimit}")
+            act = int(input(">>> "))
+            if act == 1:
+                print(f"Сколько вы хотите положить? ({self.money})")
+                print("Введите 0 для возвращения в меню.")
+                self.putmoney = int(input(">>> "))
+                if self.putmoney <= 0:
+                    break
+                    
+                elif self.putmoney > self.money:
+                    print("Мало денег для такой суммы.\n")
+                elif self.putmoney == 0:
+                    break
+                        
+                else:
+                    if self.storagedmoney + self.putmoney > self.storagelimit:
+                        print("Операция отклонена.")
+                    else:
+                        self.money -= self.putmoney
+                        self.storagedmoney += self.putmoney
+                        print(f"Вы пополнили свое хранилище на {self.putmoney}.")
+                            
+            elif act == 2:
+                while True:
+                    print("Сколько денег вы хотите забрать?")
+                    print(f"Ваш баланс - {self.money}")
+                    print(f"Баланс в хранилище - {self.storagedmoney}")
+                    print("Введите 0 для возвразещения в меню.")
+                    self.putmoney = int(input(">>> "))
+                    if self.storagelimit - self.putmoney < 0:
+                        print("Операция отменена.")
+                    elif self.putmoney > self.storagedmoney:
+                        print("У вас мало денег в хранилище для забирания такой суммы.")
+                            
+                    elif self.putmoney == 0:
+                        break
+                            
+                    else:
+                        self.money += self.putmoney
+                        self.storagedmoney -= self.putmoney
+                        print(f"Вы пополнили свой баланс на {self.putmoney}")
+                        print(f"Ваш баланс - {self.money}")
+                        print(f"Баланс в хранилище - {self.storagedmoney}")
+                        break
+                        
+            elif act == 3:
+                print(f"Уровень хранилища - {self.storagelvl}")
+                print(f"Повышение уровня стоит {self.storagelvlup} денег.")
+                print(f"Ваш баланс - {self.money}")
+                print("Будете повышать уровень? д/н")
+                act = input(">>> ")
+                if act == 'д':
+                    if self.money >= self.storagelvlup:
+                        self.money -= self.storagelvlup
+                        self.storagelvl += 1
+                        self.storagelimit += 15
+                        self.storagelvlup += choice(lvlupcost)
+                        print(f"Вы повысили уровень хранилища до {self.storagelvl}")
+                        print(f"Лимит хранлища - {self.storagelimit} (+15)")
+                        print(f"Ваш баланс - {self.money}")
+                    else:
+                        print("Мало денег.")
+                        
+                elif act == 'н':
+                    pass
+                    
+            elif act == 4:
+                print("В хранилище вы можете положить свои деньги, и они никуда не пропадут.")
+                print("Так же, вы можете увеличивать лимит хранилища, покупая улучшения.")
+                print(f"Покупая улучшение, цена поднимается на случайное число от {lvlupcost[0]} до {lvlupcost[3]}.")
+                print(f"Уровень вашего хранилища - {self.storagelvl}.")
+            
+            else:
+                break
+                            
+    def buildings(self):
+        while True:
+            print(f"\n1. Банк {self.bankstatus}")
+            print(f"2. Хранилище {self.storagestatus}")
+            act = int(input(">>> "))
+            if act == 1 and self.bankstatus == "НЕ ПОСТРОЕН":
+                print("Постройка банка стоит 75 денег.")
+                print("Построить? д/н")
+                act = input(">>> ")
+                if act == 'д' and self.money >= 75:
+                    print("Банк построен. Теперь вы можете им пользоватся!")
+                    self.bankstatus = ''
+                elif act == 'д' and self.money < 75:
+                    print("Нехватает денег.")
+                else:
+                    pass
+                    
+            elif act == 2 and self.storagestatus == "НЕ ПОСТРОЕН":
+                print("Постройка хранилища стоит 250 денег.")
+                print("Построить? д/н")
+                act = input(">>> ")
+                if act == 'д' and self.money >= 250:
+                    print("Хранилище построено. Теперь вы можете им пользоватся!")
+                    self.storagestatus = ""
+                elif act == 'д' and self.money < 250:
+                    print("Нехватает денег.")
+                else:
+                    pass
+                    
+            elif act == 1 and self.bankstatus == "":
+                self.bank()
+            
+            elif act == 2 and self.storagestatus == "":
+                self.storage()
+                
+            else:
+                break
 
 user = Player()
 if checkfile and autoload == "ВКЛ":
@@ -348,7 +500,7 @@ while True:
     print("3. История игр")
     print("4. Сохранить прогресс")
     print("5. Загрузить прогресс")
-    print("6. Банк")
+    print("6. Постройки")
     print("7. Настройки")
     print("8. Баланс игрока")
     print("9. Сбросить прогресс")
@@ -366,13 +518,17 @@ while True:
     elif act == 5:
         user.loadstate()
     elif act == 6:
-        user.bank()
+        user.buildings()
     elif act == 7:
         user.setings()
     elif act == 8:
         print(f"\nБаланс - {user.money}")
         print(f"Винстрик - {user.winstreak}")
-        print(f"Монеты в банке - {user.bankcoins}\n")
+        if user.bankstatus == "":
+            print(f"Монеты в банке - {user.bankcoins}\n")
+        if user.storagestatus == "":
+            print(f"Баланс в хранилище - {user.storagedmoney}")
+        print()
     elif act == 9:
         user.resetprogress()
     else:
