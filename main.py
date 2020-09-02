@@ -528,6 +528,15 @@ class Player:
             else:
                 break
 
+    def info(self):
+        print(f"\nБаланс - {user.money}")
+        print(f"Винстрик - {user.winstreak}")
+        if user.bankstatus == "":
+            print(f"Монеты в банке - {user.bankcoins}\n")
+        if user.storagestatus == "":
+            print(f"Баланс в хранилище - {user.storagedmoney}")
+        print()
+
 user = Player()
 if checkfile and autoload == "ВКЛ":
     user.loadstate()
@@ -564,13 +573,7 @@ while True:
     elif act == 7:
         user.settings()
     elif act == 8:
-        print(f"\nБаланс - {user.money}")
-        print(f"Винстрик - {user.winstreak}")
-        if user.bankstatus == "":
-            print(f"Монеты в банке - {user.bankcoins}\n")
-        if user.storagestatus == "":
-            print(f"Баланс в хранилище - {user.storagedmoney}")
-        print()
+        user.info()
     elif act == 9:
         user.resetprogress()
     else:
