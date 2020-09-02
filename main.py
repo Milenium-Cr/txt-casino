@@ -17,25 +17,25 @@ if checkfile:
         loadeddata = pickle.load(f)
         autoload = loadeddata["autoload"]
 
+
 class Player:
     def __init__(self):
-        
         # стартовая сумма денег
         self.startmoney = 35
-        
+
         # "общие" переменные
         self.money = self.startmoney
         self.winstreak = 0
         self.bet = 0
         self.rate = 0
-        
+
         # банк (142-194)
         self.bankcoins = 0
         self.bankstatus = "НЕ ПОСТРОЕН"
-        
+
         # настройки
         self.autoloadstat = "ВЫКЛ"
-        
+
         # для сохранения/загрузки прогресса (120-135)
         self.state = {}
 
@@ -48,12 +48,12 @@ class Player:
         self.buyHelp = None
         self.CFgames = []
         self.CFlist_status = ""
-        
+
         # переменные для "камень ножницы бумага"
         self.kanobubot = 0
         self.KNBgames = []
         self.KNBlist_status = ""
-        
+
         # хранилище
         self.storagedmoney = 0
         self.putmoney = 0
@@ -119,7 +119,7 @@ class Player:
                             self.winstreak -= 1
                         elif self.winstreak > 0:
                             self.winstreak = 0
-                            
+
                         print(f"Ваш винстрик - {self.winstreak}")
                         self.CFgames.append("(-%(lose)s) {Баланс %(money)s}" % {"lose": self.rate, "money": self.money})
                     if self.money > 0:
@@ -155,7 +155,7 @@ class Player:
             for j in self.CFgames:
                 count += 1
                 print(f"{count}. {j}")
-                
+
     def KNBreplays(self):
         if self.KNBgames == []:
             print("\nНеактивировано. Сыграйте 1 игру в KNB.\n")
@@ -200,7 +200,7 @@ class Player:
         self.storagelimit = loadeddata["storagelimit"]
         self.storagedmoney = loadeddata["storagedmoney"]
         print("\nПрогресс загружен!\n")
-        
+
     def bank(self):
         while True:
             print("Выберите функцию:")
@@ -216,7 +216,7 @@ class Player:
                 act = int(input(">>> "))
             except ValueError:
                 act = False
-        
+
             if act == 1:
                 if self.money >= 20:
                     self.money -= 20
@@ -225,7 +225,7 @@ class Player:
                     print(f"Ваш баланс - {self.money}")
                 else:
                     print(f"У вас мало денег для покупки монет.\nНакопите еще {25 - self.money}")
-        
+
             elif act == 2:
                 if self.winstreak >= 3:
                     self.winstreak -= 3
@@ -234,7 +234,7 @@ class Player:
                     print(f"Ваш винстрик - {self.winstreak}")
                 else:
                     print(f"У вас мало винстрика для покупки монет! Накопите еще {5 - self.winstreak}")
-                
+
             elif act == 3:
                 if self.bankcoins >= 1:
                     self.bankcoins -= 1
@@ -243,7 +243,7 @@ class Player:
                     print(f"Ваш баланс - {self.money}")
                 else:
                     print("Недостаточно монет.")
-                    
+
             elif act == 4:
                 if self.bankcoins >= 1:
                     self.bankcoins -= 1
@@ -252,13 +252,13 @@ class Player:
                     print(f"Ваш винстрик - {self.winstreak}")
                 else:
                     print("\nНедостаточно монет\n")
-            
+
             elif act == 5:
                 print("\nЭто банк, в котором вы можете обменивать свои ресурсы на монеты. Монеты - накопительная валюта, и она будет лежать в банке бесконечно.\n")
-            
+
             else:
                 break
-                
+
     def settings(self):
         while True:
             print(f"1. Автозагрузка {self.autoloadstat}")
@@ -274,7 +274,7 @@ class Player:
                 self.autoloadstat = "ВЫКЛ"
             else:
                 break
-    
+
     def resetprogress(self):
         print("\nВы точно хотите сбросить прогресс? y/n || д/н")
         act = input(">>> ")
@@ -295,7 +295,7 @@ class Player:
             print("Прогресс успешно сброшен.")
         else:
             pass
-    
+
     def games(self):
         while True:
             print("1. Коинфлип")
@@ -312,13 +312,13 @@ class Player:
                 user.kanobu()
             else:
                 break
-    
+
     def kanobu(self):
         print("КаНоБу (камень-ножницы-бумага).")
         print("Приз увеличен до х3.")
         print("При проигрыше, нельзя вернуть свои деньги.")
         print("Введите 0 для выхода в меню.")
-        
+
         while True:
             print("Какая будет ставка? {%s}" % self.money)
             self.rate = int(input(">>> "))
@@ -336,7 +336,7 @@ class Player:
                         break
                     else:
                         print("\n\nНеверный ввод\n\n")
-                
+
                 self.kanobubot = randint(1, 3)
                 if self.bet == self.kanobubot:
                     print("Ничья!")
@@ -348,7 +348,8 @@ class Player:
                     self.kanobubot == 3 or \
                     self.bet == 3 and \
                     self.kanobubot == 1:
-                    self.money += self.rate * 3
+                     
+                     self.money += self.rate * 3
                     # +1 к винстрику
                     if self.winstreak < 0:
                         self.winstreak = 0
