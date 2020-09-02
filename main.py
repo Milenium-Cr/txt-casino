@@ -259,7 +259,7 @@ class Player:
             else:
                 break
                 
-    def setings(self):
+    def settings(self):
         while True:
             print(f"1. Автозагрузка {self.autoloadstat}")
 
@@ -562,7 +562,7 @@ while True:
     elif act == 6:
         user.buildings()
     elif act == 7:
-        user.setings()
+        user.settings()
     elif act == 8:
         print(f"\nБаланс - {user.money}")
         print(f"Винстрик - {user.winstreak}")
