@@ -230,7 +230,7 @@ class Player:
                 if self.winstreak >= 3:
                     self.winstreak -= 3
                     self.bankcoins += 1
-                    print(f"Вы купили 1 монету. {{self.backcoins}}")
+                    print(f"Вы купили 1 монету. {{{self.backcoins}}}")
                     print(f"Ваш винстрик - {self.winstreak}")
                 else:
                     print(f"У вас мало винстрика для покупки монет! Накопите еще {5 - self.winstreak}")
