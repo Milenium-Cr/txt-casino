@@ -69,7 +69,12 @@ class Player:
         print("Введите 0 для возвращения в меню.")
         while True:
             print("\nВаша ставка? {%s}" % self.money)
-            self.rate = int(input(">>> "))
+
+            try:
+                self.rate = int(input(">>> "))
+            except ValueError:
+                self.rate = 0
+
             if self.rate == 0:
                 break
             if self.rate > self.money:
@@ -206,7 +211,11 @@ class Player:
             print("5. Что за банк?")
             print("6. Выйти")
             print(f"Запас ваших монеток в банке - {self.bankcoins}")
-            act = int(input(">>> "))
+
+            try:
+                act = int(input(">>> "))
+            except ValueError:
+                act = False
         
             if act == 1:
                 if self.money >= 20:
@@ -253,7 +262,12 @@ class Player:
     def setings(self):
         while True:
             print(f"1. Автозагрузка {self.autoloadstat}")
-            setsettings = int(input(">>> "))
+
+            try:
+                setsettings = int(input(">>> "))
+            except ValueError:
+                setsettings = False
+
             if setsettings == 1 and self.autoloadstat == "ВЫКЛ":
                 self.autoloadstat = "ВКЛ"
             elif setsettings == 1 and self.autoloadstat == "ВКЛ":
@@ -286,7 +300,12 @@ class Player:
         while True:
             print("1. Коинфлип")
             print("2. Камень-ножницы-бумага")
-            act = int(input(">>> "))
+
+            try:
+                act = int(input(">>> "))
+            except ValueError:
+                act = False
+
             if act == 1:
                 user.coinflip()
             elif act == 2:
@@ -362,7 +381,12 @@ class Player:
         while True:
             print(f"\n\n1. КоинФлип игры {self.CFlist_status}")
             print(f"2. КаНоБу игры {self.KNBlist_status}")
-            act = int(input(">>> "))
+
+            try:
+                act = int(input(">>> "))
+            except ValueError:
+                act = False
+
             if act == 1:
                 self.CFreplays()
             elif act == 2:
@@ -381,7 +405,12 @@ class Player:
             if act == 1:
                 print(f"Сколько вы хотите положить? ({self.money})")
                 print("Введите 0 для возвращения в меню.")
-                self.putmoney = int(input(">>> "))
+
+                try:
+                    self.putmoney = int(input(">>> "))
+                except ValueError:
+                    self.putmoney = False
+
                 if self.putmoney <= 0:
                     break
                     
@@ -404,7 +433,12 @@ class Player:
                     print(f"Ваш баланс - {self.money}")
                     print(f"Баланс в хранилище - {self.storagedmoney}")
                     print("Введите 0 для возвразещения в меню.")
-                    self.putmoney = int(input(">>> "))
+
+                    try:
+                        self.putmoney = int(input(">>> "))
+                    except ValueError:
+                        self.putmoney = False
+
                     if self.storagelimit - self.putmoney < 0:
                         print("Операция отменена.")
                     elif self.putmoney > self.storagedmoney:
@@ -455,7 +489,12 @@ class Player:
         while True:
             print(f"\n1. Банк {self.bankstatus}")
             print(f"2. Хранилище {self.storagestatus}")
-            act = int(input(">>> "))
+
+            try:
+                act = int(input(">>> "))
+            except ValueError:
+                act = False
+
             if act == 1 and self.bankstatus == "НЕ ПОСТРОЕН":
                 print("Постройка банка стоит 75 денег.")
                 print("Построить? д/н")
@@ -505,7 +544,10 @@ while True:
     print("8. Баланс игрока")
     print("9. Сбросить прогресс")
 
-    act = int(input(">>> "))
+    try:
+        act = int(input(">>> "))
+    except ValueError:
+        act = False
 
     if act == 1:
         user.games()
